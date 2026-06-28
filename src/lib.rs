@@ -10,4 +10,3 @@ pub mod notifications;
 pub mod scheduler;
 pub mod theme;
 pub mod utils;
-

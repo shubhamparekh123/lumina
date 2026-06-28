@@ -1,4 +1,9 @@
-use std::{fs::{self, File, OpenOptions}, io, path::Path, sync::Mutex};
+use std::{
+    fs::{self, File, OpenOptions},
+    io,
+    path::Path,
+    sync::Mutex,
+};
 
 use tracing_subscriber::EnvFilter;
 
@@ -28,4 +33,3 @@ pub fn init_file(path: &Path) -> Result<(), io::Error> {
 fn default_filter() -> EnvFilter {
     EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("lumina=info"))
 }
-

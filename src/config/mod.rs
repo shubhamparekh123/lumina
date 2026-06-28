@@ -1,4 +1,7 @@
-use std::{fs, io, path::{Path, PathBuf}};
+use std::{
+    fs, io,
+    path::{Path, PathBuf},
+};
 
 use chrono::NaiveTime;
 use serde::{Deserialize, Serialize};
@@ -130,7 +133,10 @@ impl ConfigStore {
     /// Persists validated configuration using a temporary file and rename.
     pub fn save(&self, config: &AppConfig) -> Result<(), ConfigError> {
         config.validate()?;
-        let parent = self.path.parent().ok_or_else(|| ConfigError::InvalidPath(self.path.clone()))?;
+        let parent = self
+            .path
+            .parent()
+            .ok_or_else(|| ConfigError::InvalidPath(self.path.clone()))?;
         fs::create_dir_all(parent).map_err(|source| ConfigError::Write {
             path: parent.to_path_buf(),
             source,
@@ -156,9 +162,17 @@ pub enum ConfigError {
     #[error("invalid configuration path: {0}")]
     InvalidPath(PathBuf),
     #[error("could not read configuration {path}: {source}")]
-    Read { path: PathBuf, #[source] source: io::Error },
+    Read {
+        path: PathBuf,
+        #[source]
+        source: io::Error,
+    },
     #[error("could not write configuration {path}: {source}")]
-    Write { path: PathBuf, #[source] source: io::Error },
+    Write {
+        path: PathBuf,
+        #[source]
+        source: io::Error,
+    },
     #[error("invalid TOML configuration: {0}")]
     Parse(#[from] toml::de::Error),
     #[error("could not serialize configuration: {0}")]
@@ -192,7 +206,10 @@ mod tests {
     fn rejects_invalid_time() {
         assert!(matches!(
             AppConfig::parse("light_time = \"25:00\""),
-            Err(ConfigError::InvalidTime { field: "light_time", .. })
+            Err(ConfigError::InvalidTime {
+                field: "light_time",
+                ..
+            })
         ));
     }
 
@@ -204,4 +221,3 @@ mod tests {
         assert!(store.path().exists());
     }
 }
-

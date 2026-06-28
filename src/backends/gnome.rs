@@ -61,9 +61,7 @@ impl GnomeBackend {
     }
 
     fn set_color_scheme(&self, value: &str) -> Result<(), BackendError> {
-        let output = self
-            .runner
-            .run("gsettings", &["set", SCHEMA, KEY, value])?;
+        let output = self.runner.run("gsettings", &["set", SCHEMA, KEY, value])?;
         if output.success {
             Ok(())
         } else {
@@ -130,12 +128,18 @@ mod tests {
 
     #[test]
     fn detects_dark_theme_from_gsettings_output() {
-        assert_eq!(backend_with("'prefer-dark'\n").current_theme().unwrap(), Theme::Dark);
+        assert_eq!(
+            backend_with("'prefer-dark'\n").current_theme().unwrap(),
+            Theme::Dark
+        );
     }
 
     #[test]
     fn detects_light_theme_from_gsettings_output() {
-        assert_eq!(backend_with("'default'\n").current_theme().unwrap(), Theme::Light);
+        assert_eq!(
+            backend_with("'default'\n").current_theme().unwrap(),
+            Theme::Light
+        );
     }
 
     #[test]
@@ -146,4 +150,3 @@ mod tests {
         ));
     }
 }
-

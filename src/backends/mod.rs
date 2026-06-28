@@ -22,4 +22,3 @@ pub enum BackendError {
     #[error("desktop returned an unsupported color scheme: {0}")]
     UnsupportedTheme(String),
 }
-

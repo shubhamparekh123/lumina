@@ -23,4 +23,3 @@ fn persisted_configuration_drives_scheduler() {
         .and_time(NaiveTime::from_hms_opt(12, 0, 0).unwrap());
     assert_eq!(schedule.evaluate(noon).unwrap().target_theme, Theme::Light);
 }
-

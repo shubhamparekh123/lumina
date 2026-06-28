@@ -10,7 +10,12 @@ pub struct Cli {
 
 impl Cli {
     pub fn is_daemon_process(&self) -> bool {
-        matches!(self.command, Command::Daemon { command: DaemonCommand::Run })
+        matches!(
+            self.command,
+            Command::Daemon {
+                command: DaemonCommand::Run
+            }
+        )
     }
 }
 
@@ -41,4 +46,3 @@ pub enum DaemonCommand {
     #[command(hide = true)]
     Run,
 }
-

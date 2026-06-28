@@ -82,4 +82,3 @@ mod tests {
         assert_eq!(backend.current_theme().unwrap(), Theme::Dark);
     }
 }
-

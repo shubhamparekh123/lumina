@@ -29,4 +29,3 @@ pub enum NotificationError {
     #[error("could not show desktop notification: {0}")]
     Show(#[source] notify_rust::error::Error),
 }
-

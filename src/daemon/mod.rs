@@ -82,7 +82,7 @@ pub fn stop() -> Result<u32, DaemonError> {
             }
             std::thread::sleep(Duration::from_millis(50));
         }
-        return Err(DaemonError::StopTimeout(pid));
+        Err(DaemonError::StopTimeout(pid))
     }
     #[cfg(not(unix))]
     return Err(DaemonError::UnsupportedPlatform);
@@ -157,7 +157,9 @@ async fn shutdown_signal() -> Result<(), DaemonError> {
 
 #[cfg(not(unix))]
 async fn shutdown_signal() -> Result<(), DaemonError> {
-    tokio::signal::ctrl_c().await.map_err(DaemonError::SignalSetup)
+    tokio::signal::ctrl_c()
+        .await
+        .map_err(DaemonError::SignalSetup)
 }
 
 fn state_dir() -> Result<PathBuf, DaemonError> {
@@ -174,7 +176,10 @@ fn read_running_pid(path: &Path) -> Result<Option<i32>, DaemonError> {
         Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
         Err(error) => return Err(DaemonError::PidFile(error)),
     };
-    let pid: i32 = contents.trim().parse().map_err(|_| DaemonError::InvalidPidFile)?;
+    let pid: i32 = contents
+        .trim()
+        .parse()
+        .map_err(|_| DaemonError::InvalidPidFile)?;
     if pid <= 0 {
         return Err(DaemonError::InvalidPidFile);
     }

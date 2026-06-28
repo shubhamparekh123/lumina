@@ -1,7 +1,10 @@
 use chrono::{Days, Local, NaiveDateTime, NaiveTime};
 use thiserror::Error;
 
-use crate::{config::{AppConfig, ConfigError, ScheduleMode}, theme::Theme};
+use crate::{
+    config::{AppConfig, ConfigError, ScheduleMode},
+    theme::Theme,
+};
 
 /// Result of evaluating an automation schedule.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,11 +30,14 @@ impl TimeSchedule {
         if light_time == dark_time {
             return Err(SchedulerError::EqualTimes);
         }
-        Ok(Self { light_time, dark_time })
+        Ok(Self {
+            light_time,
+            dark_time,
+        })
     }
 
     pub fn from_config(config: &AppConfig) -> Result<Self, SchedulerError> {
-        Ok(Self::new(config.light_time()?, config.dark_time()?)?)
+        Self::new(config.light_time()?, config.dark_time()?)
     }
 
     fn is_light_at(&self, time: NaiveTime) -> bool {
@@ -42,7 +48,10 @@ impl TimeSchedule {
         }
     }
 
-    fn next_occurrence(now: NaiveDateTime, time: NaiveTime) -> Result<NaiveDateTime, SchedulerError> {
+    fn next_occurrence(
+        now: NaiveDateTime,
+        time: NaiveTime,
+    ) -> Result<NaiveDateTime, SchedulerError> {
         let today = now.date().and_time(time);
         if today > now {
             Ok(today)
@@ -57,7 +66,11 @@ impl TimeSchedule {
 
 impl ScheduleStrategy for TimeSchedule {
     fn evaluate(&self, now: NaiveDateTime) -> Result<ScheduleDecision, SchedulerError> {
-        let target_theme = if self.is_light_at(now.time()) { Theme::Light } else { Theme::Dark };
+        let target_theme = if self.is_light_at(now.time()) {
+            Theme::Light
+        } else {
+            Theme::Dark
+        };
         let next_light = Self::next_occurrence(now, self.light_time)?;
         let next_dark = Self::next_occurrence(now, self.dark_time)?;
         Ok(ScheduleDecision {
@@ -94,18 +107,22 @@ pub enum SchedulerError {
 
 #[cfg(test)]
 mod tests {
-    use chrono::NaiveDate;
     use super::*;
+    use chrono::NaiveDate;
 
     fn at(hour: u32, minute: u32) -> NaiveDateTime {
-        NaiveDate::from_ymd_opt(2026, 6, 27).unwrap().and_hms_opt(hour, minute, 0).unwrap()
+        NaiveDate::from_ymd_opt(2026, 6, 27)
+            .unwrap()
+            .and_hms_opt(hour, minute, 0)
+            .unwrap()
     }
 
     fn schedule(light: (u32, u32), dark: (u32, u32)) -> TimeSchedule {
         TimeSchedule::new(
             NaiveTime::from_hms_opt(light.0, light.1, 0).unwrap(),
             NaiveTime::from_hms_opt(dark.0, dark.1, 0).unwrap(),
-        ).unwrap()
+        )
+        .unwrap()
     }
 
     #[test]
@@ -119,17 +136,38 @@ mod tests {
     fn daytime_schedule_selects_dark_after_window() {
         let decision = schedule((7, 0), (18, 30)).evaluate(at(20, 0)).unwrap();
         assert_eq!(decision.target_theme, Theme::Dark);
-        assert_eq!(decision.next_change, at(7, 0).checked_add_days(Days::new(1)).unwrap());
+        assert_eq!(
+            decision.next_change,
+            at(7, 0).checked_add_days(Days::new(1)).unwrap()
+        );
     }
 
     #[test]
     fn supports_light_windows_crossing_midnight() {
-        assert_eq!(schedule((18, 0), (6, 0)).evaluate(at(23, 0)).unwrap().target_theme, Theme::Light);
-        assert_eq!(schedule((18, 0), (6, 0)).evaluate(at(12, 0)).unwrap().target_theme, Theme::Dark);
+        assert_eq!(
+            schedule((18, 0), (6, 0))
+                .evaluate(at(23, 0))
+                .unwrap()
+                .target_theme,
+            Theme::Light
+        );
+        assert_eq!(
+            schedule((18, 0), (6, 0))
+                .evaluate(at(12, 0))
+                .unwrap()
+                .target_theme,
+            Theme::Dark
+        );
     }
 
     #[test]
     fn boundary_switches_to_new_theme() {
-        assert_eq!(schedule((7, 0), (18, 30)).evaluate(at(18, 30)).unwrap().target_theme, Theme::Dark);
+        assert_eq!(
+            schedule((7, 0), (18, 30))
+                .evaluate(at(18, 30))
+                .unwrap()
+                .target_theme,
+            Theme::Dark
+        );
     }
 }

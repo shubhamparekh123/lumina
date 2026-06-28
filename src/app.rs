@@ -53,9 +53,16 @@ fn notify_best_effort(notifier: &dyn NotificationService, theme: Theme) {
 fn print_status(backend: &dyn ThemeBackend) -> Result<(), AppError> {
     let config = ConfigStore::standard()?.load_or_create()?;
     let current = backend.current_theme()?;
-    let automation = if config.automation { "Enabled" } else { "Disabled" };
+    let automation = if config.automation {
+        "Enabled"
+    } else {
+        "Disabled"
+    };
     let next_change = if config.automation {
-        scheduler::evaluate_now(&config)?.next_change.format("%H:%M").to_string()
+        scheduler::evaluate_now(&config)?
+            .next_change
+            .format("%H:%M")
+            .to_string()
     } else {
         "Disabled".to_owned()
     };
@@ -80,4 +87,3 @@ pub enum AppError {
     #[error(transparent)]
     Notification(#[from] NotificationError),
 }
-

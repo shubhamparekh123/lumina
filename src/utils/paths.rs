@@ -13,4 +13,3 @@ pub fn state_dir() -> Option<PathBuf> {
         .or_else(dirs::data_local_dir)
         .map(|path| path.join("lumina"))
 }
-

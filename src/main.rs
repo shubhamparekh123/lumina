@@ -20,4 +20,3 @@ async fn main() -> ExitCode {
         }
     }
 }
-
